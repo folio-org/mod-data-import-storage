@@ -80,6 +80,7 @@ public class InstancePostProcessingEventHandler implements EventHandler {
    */
   @Override
   public CompletableFuture<DataImportEventPayload> handle(DataImportEventPayload dataImportEventPayload) {
+    LOG.info("Start handling message.");
     CompletableFuture<DataImportEventPayload> future = new CompletableFuture<>();
     try {
       String instanceAsString = dataImportEventPayload.getContext().get(INSTANCE.value());

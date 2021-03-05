@@ -63,7 +63,7 @@ public class ParsedRecordChunksKafkaHandler implements AsyncRecordHandler<String
   @Override
   public Future<String> handle(KafkaConsumerRecord<String, String> record) {
     Event event = new JsonObject(record.value()).mapTo(Event.class);
-
+    LOGGER.info("Start handling message.");
     try {
       RecordCollection recordCollection = new JsonObject(ZIPArchiver.unzip(event.getEventPayload())).mapTo(RecordCollection.class);
 
@@ -73,7 +73,7 @@ public class ParsedRecordChunksKafkaHandler implements AsyncRecordHandler<String
       String key = record.key();
 
       int chunkNumber = chunkCounter.incrementAndGet();
-      LOGGER.debug("RecordCollection has been received, starting processing... chunkNumber {}-{}", chunkNumber, key);
+      LOGGER.info("RecordCollection has been received, starting processing... chunkNumber {}-{}", chunkNumber, key);
       return recordService.saveRecords(recordCollection, tenantId)
         .compose(recordsBatchResponse -> sendBackRecordsBatchResponse(recordsBatchResponse, kafkaHeaders, tenantId, chunkNumber),
           th -> {
@@ -121,7 +121,7 @@ public class ParsedRecordChunksKafkaHandler implements AsyncRecordHandler<String
     producer.write(record, war -> {
       producer.end(ear -> producer.close());
       if (war.succeeded()) {
-        LOGGER.debug("RecordCollection processing has been completed with response sent... chunkNumber {}-{}", chunkNumber, record.key());
+        LOGGER.info("RecordCollection processing has been completed with response sent... chunkNumber {}-{}", chunkNumber, record.key());
         writePromise.complete(record.key());
       } else {
         Throwable cause = war.cause();
