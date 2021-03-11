@@ -28,6 +28,7 @@ stages:
       answers:
         image.repository: docker.dev.folio.org/mod-source-record-storage
         image.tag: folijet-${CICD_EXECUTION_SEQUENCE}
+        postJob.enabled: true
       targetNamespace: folijet
       name: mod-source-record-storage
 timeout: 60
