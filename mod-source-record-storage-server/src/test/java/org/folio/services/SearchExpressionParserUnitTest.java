@@ -354,9 +354,9 @@ public class SearchExpressionParserUnitTest {
   @Test
   public void shouldParseLeaderSearchExpression_with_boolean_operators() {
     // given
-    String fieldsSearchExpression = "(p_05 = 'a' and p_06 = 'b') or (p_07 = '1' and p_08 = '2')";
+    String leaderSearchExpression = "(p_05 = 'a' and p_06 = 'b') or (p_07 = '1' and p_08 = '2')";
     // when
-    ParseLeaderResult result = parseLeaderSearchExpression(fieldsSearchExpression);
+    ParseLeaderResult result = parseLeaderSearchExpression(leaderSearchExpression);
     // then
     assertTrue(result.isEnabled());
     assertEquals(asList("a", "b", "1", "2"), result.getBindingParams());
