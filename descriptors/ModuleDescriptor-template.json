@@ -408,6 +408,14 @@
       {
         "name": "KAFKA_PORT",
         "value": "9092"
+      },
+      {
+        "name": "kafka.consumer.max.poll.records",
+        "value": "500"
+      },
+      {
+        "name": "kafka.consumer.max.poll.interval.ms",
+        "value": "300000"
       }
     ]
   }

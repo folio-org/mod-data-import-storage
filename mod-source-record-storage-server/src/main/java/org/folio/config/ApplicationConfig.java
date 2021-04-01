@@ -26,6 +26,10 @@ public class ApplicationConfig {
   private int replicationFactor;
   @Value("${ENV:folio}")
   private String envId;
+  @Value("${kafka.consumer.max.poll.records:500}")
+  private int maxPollRecords;
+  @Value("${kafka.consumer.max.poll.interval.ms:300000}")
+  private String maxPollInterval;
 
   @Bean(name = "newKafkaConfig")
   public KafkaConfig kafkaConfigBean() {
