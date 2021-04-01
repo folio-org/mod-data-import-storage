@@ -411,7 +411,7 @@
       },
       {
         "name": "kafka.consumer.max.poll.records",
-        "value": "500"
+        "value": "5"
       },
       {
         "name": "kafka.consumer.max.poll.interval.ms",
