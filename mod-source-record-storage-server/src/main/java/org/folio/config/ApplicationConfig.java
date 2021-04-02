@@ -28,11 +28,12 @@ public class ApplicationConfig {
   private String envId;
   @Value("${kafka.consumer.max.poll.records:6}")
   private int maxPollRecords;
-  @Value("${kafka.consumer.max.poll.interval.ms:300000}")
+  @Value("${kafka.consumer.max.poll.interval.ms:60000}")
   private String maxPollInterval;
 
   @Bean(name = "newKafkaConfig")
   public KafkaConfig kafkaConfigBean() {
+
     KafkaConfig kafkaConfig = KafkaConfig.builder()
       .envId(envId)
       .kafkaHost(kafkaHost)
@@ -40,6 +41,7 @@ public class ApplicationConfig {
       .okapiUrl(okapiUrl)
       .replicationFactor(replicationFactor)
       .build();
+
     LOGGER.debug("kafkaConfig: {}", kafkaConfig);
 
     return kafkaConfig;
