@@ -78,7 +78,7 @@ public final class EventHandlingUtil {
                                                  List<KafkaHeader> kafkaHeaders, KafkaConfig kafkaConfig, String key) {
     Event event;
     try {
-      LOGGER.info("sendEventToKafka: eventType = " + eventType);
+      LOGGER.error("sendEventToKafka: eventType = " + eventType);
       event = new Event()
         .withId(UUID.randomUUID().toString())
         .withEventType(eventType)
@@ -107,7 +107,7 @@ public final class EventHandlingUtil {
     producer.write(record, war -> {
       producer.end(ear -> producer.close());
       if (war.succeeded()) {
-        LOGGER.info("Event with type {} was sent to kafka", eventType);
+        LOGGER.info("Event with type {} was sent to kafka", event.getEventType());
         promise.complete(true);
       } else {
         Throwable cause = war.cause();

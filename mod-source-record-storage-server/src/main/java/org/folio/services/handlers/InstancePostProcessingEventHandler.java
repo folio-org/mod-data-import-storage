@@ -98,13 +98,13 @@ public class InstancePostProcessingEventHandler implements EventHandler {
       JsonObject instance = new JsonObject(instanceAsString);
       setInstanceIdToRecord(record, instance);
       setSuppressFormDiscovery(record, instance.getBoolean("discoverySuppress", false));
-      LOG.info("Handle: " + dataImportEventPayload.getEventType());
+      LOG.error("Handle: " + dataImportEventPayload.getEventType());
       insertOrUpdateRecordWithExternalIdsHolder(record, tenantId)
         .compose(updatedRecord -> updatePreviousRecords(updatedRecord.getExternalIdsHolder().getInstanceId(), updatedRecord.getSnapshotId(), tenantId)
           .map(updatedRecord))
         .onComplete(updateAr -> {
           if (updateAr.succeeded()) {
-            LOG.info("updateAr.succeeded()");
+            LOG.info("UpdateAr = succeeded()");
             record.getParsedRecord().setContent(ParsedRecordDaoUtil.normalizeContent(record.getParsedRecord()));
             HashMap<String, String> context = dataImportEventPayload.getContext();
             context.put(Record.RecordType.MARC.value(), Json.encode(record));
@@ -114,6 +114,7 @@ public class InstancePostProcessingEventHandler implements EventHandler {
             context.put(MARC_BIBLIOGRAPHIC.value(), Json.encode(record));
             sendEventToKafka(dataImportEventPayload.getTenant(), Json.encode(context), DI_SRS_MARC_BIB_INSTANCE_HRID_SET.value(),
               kafkaHeaders, kafkaConfig, key);
+            LOG.error("dataImportEventPayload.getEventType() = " + dataImportEventPayload.getEventType());
             // MODSOURMAN-384: sent event to log when record updated implicitly only for INSTANCE_UPDATED case
 //            if (dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_UPDATED.value())
 //              || dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_CREATED.value())) {
