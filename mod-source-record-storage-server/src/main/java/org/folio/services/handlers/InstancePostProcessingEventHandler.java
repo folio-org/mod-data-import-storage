@@ -115,12 +115,12 @@ public class InstancePostProcessingEventHandler implements EventHandler {
             sendEventToKafka(dataImportEventPayload.getTenant(), Json.encode(context), DI_SRS_MARC_BIB_INSTANCE_HRID_SET.value(),
               kafkaHeaders, kafkaConfig, key);
             // MODSOURMAN-384: sent event to log when record updated implicitly only for INSTANCE_UPDATED case
-            if (dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_UPDATED.value())
-              || dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_CREATED.value())) {
+//            if (dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_UPDATED.value())
+//              || dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_CREATED.value())) {
               LOG.info("Prepare DI_SRS_MARC_BIB_RECORD_UPDATED");
               sendEventToKafka(dataImportEventPayload.getTenant(), Json.encode(context), DI_SRS_MARC_BIB_RECORD_UPDATED.value(),
                 kafkaHeaders, kafkaConfig, key);
-            }
+//           }
             future.complete(dataImportEventPayload);
           } else {
             LOG.error(FAIL_MSG, updateAr.cause());
