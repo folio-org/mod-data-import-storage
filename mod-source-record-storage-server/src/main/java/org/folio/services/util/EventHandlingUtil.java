@@ -78,6 +78,7 @@ public final class EventHandlingUtil {
                                                  List<KafkaHeader> kafkaHeaders, KafkaConfig kafkaConfig, String key) {
     Event event;
     try {
+      LOGGER.info("sendEventToKafka: eventType = " + eventType);
       event = new Event()
         .withId(UUID.randomUUID().toString())
         .withEventType(eventType)
