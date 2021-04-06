@@ -42,6 +42,7 @@ import static org.folio.DataImportEventTypes.DI_INVENTORY_INSTANCE_UPDATED;
 import static org.folio.DataImportEventTypes.DI_SRS_MARC_BIB_RECORD_UPDATED;
 import static org.folio.dao.util.RecordDaoUtil.filterRecordByInstanceId;
 import static org.folio.dao.util.RecordDaoUtil.filterRecordByNotSnapshotId;
+import static org.folio.rest.jaxrs.model.DataImportEventTypes.DI_INVENTORY_INSTANCE_CREATED;
 import static org.folio.rest.jaxrs.model.DataImportEventTypes.DI_SRS_MARC_BIB_INSTANCE_HRID_SET;
 import static org.folio.rest.jaxrs.model.EntityType.INSTANCE;
 import static org.folio.rest.jaxrs.model.EntityType.MARC_BIBLIOGRAPHIC;
@@ -114,7 +115,8 @@ public class InstancePostProcessingEventHandler implements EventHandler {
             sendEventToKafka(dataImportEventPayload.getTenant(), Json.encode(context), DI_SRS_MARC_BIB_INSTANCE_HRID_SET.value(),
               kafkaHeaders, kafkaConfig, key);
             // MODSOURMAN-384: sent event to log when record updated implicitly only for INSTANCE_UPDATED case
-            if (dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_UPDATED.value())) {
+            if (dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_UPDATED.value())
+              || dataImportEventPayload.getEventType().equals(DI_INVENTORY_INSTANCE_CREATED.value())) {
               LOG.info("Prepare DI_SRS_MARC_BIB_RECORD_UPDATED");
               sendEventToKafka(dataImportEventPayload.getTenant(), Json.encode(context), DI_SRS_MARC_BIB_RECORD_UPDATED.value(),
                 kafkaHeaders, kafkaConfig, key);
