@@ -8,7 +8,7 @@ import static org.folio.rest.jaxrs.model.MappingDetail.MarcMappingOption.UPDATE;
 import static org.folio.rest.jaxrs.model.ProfileSnapshotWrapper.ContentType.ACTION_PROFILE;
 import static org.folio.rest.jaxrs.model.ProfileSnapshotWrapper.ContentType.JOB_PROFILE;
 import static org.folio.rest.jaxrs.model.ProfileSnapshotWrapper.ContentType.MAPPING_PROFILE;
-import static org.folio.rest.jaxrs.model.Record.RecordType.MARC;
+import static org.folio.rest.jaxrs.model.Record.RecordType.MARC_BIB;
 import static org.folio.services.handlers.actions.ModifyRecordEventHandler.MATCHED_MARC_BIB_KEY;
 
 import java.io.IOException;
@@ -143,7 +143,7 @@ public class ModifyRecordEventHandlerTest extends AbstractLBServiceTest {
       .withSnapshotId(snapshot.getJobExecutionId())
       .withGeneration(0)
       .withMatchedId(recordId)
-      .withRecordType(MARC)
+      .withRecordType(MARC_BIB)
       .withRawRecord(rawRecord)
       .withParsedRecord(parsedRecord);
 

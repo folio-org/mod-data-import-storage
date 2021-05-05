@@ -2,7 +2,8 @@ package org.folio.services;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static org.folio.dataimport.util.RestUtil.OKAPI_URL_HEADER;
-import static org.folio.rest.jaxrs.model.Record.RecordType.MARC;
+import static org.folio.rest.jaxrs.model.Record.RecordType.MARC_AUTHORITY;
+import static org.folio.rest.jaxrs.model.Record.RecordType.MARC_BIB;
 import static org.folio.rest.util.OkapiConnectionParams.OKAPI_TENANT_HEADER;
 import static org.folio.rest.util.OkapiConnectionParams.OKAPI_TOKEN_HEADER;
 
@@ -25,6 +26,7 @@ import org.folio.dao.util.SnapshotDaoUtil;
 import org.folio.processing.events.utils.ZIPArchiver;
 import org.folio.rest.jaxrs.model.ParsedRecord;
 import org.folio.rest.jaxrs.model.ParsedRecordDto;
+import org.folio.rest.jaxrs.model.ParsedRecordDto.RecordType;
 import org.folio.rest.jaxrs.model.RawRecord;
 import org.folio.rest.jaxrs.model.Record;
 import org.folio.rest.jaxrs.model.Record.State;
@@ -73,7 +75,8 @@ public class UpdatedRecordEventHandlingServiceTest extends AbstractLBServiceTest
 
   private static String recordId = UUID.randomUUID().toString();
 
-  private Record record;
+  private Record marcBibRecord;
+  private Record marcAuthorityRecord;
 
   @BeforeClass
   public static void setUpClass() throws IOException {
@@ -99,14 +102,23 @@ public class UpdatedRecordEventHandlingServiceTest extends AbstractLBServiceTest
       .withJobExecutionId(UUID.randomUUID().toString())
       .withProcessingStartedDate(new Date())
       .withStatus(Snapshot.Status.COMMITTED);
-    record = new Record()
+    marcBibRecord = new Record()
       .withId(recordId)
       .withSnapshotId(snapshot.getJobExecutionId())
       .withGeneration(0)
       .withMatchedId(recordId)
-      .withRecordType(MARC)
+      .withRecordType(MARC_BIB)
       .withRawRecord(rawRecord)
       .withParsedRecord(parsedRecord);
+    marcBibRecord = new Record()
+      .withId(recordId)
+      .withSnapshotId(snapshot.getJobExecutionId())
+      .withGeneration(0)
+      .withMatchedId(recordId)
+      .withRecordType(MARC_AUTHORITY)
+      .withRawRecord(rawRecord)
+      .withParsedRecord(parsedRecord);
+
     SnapshotDaoUtil.save(postgresClientFactory.getQueryExecutor(TENANT_ID), snapshot).onComplete(save -> {
       if (save.failed()) {
         context.fail(save.cause());
@@ -127,15 +139,24 @@ public class UpdatedRecordEventHandlingServiceTest extends AbstractLBServiceTest
   }
 
   @Test
-  public void shouldUpdateParsedRecord(TestContext context) {
+  public void shouldUpdateParsedMarcBibRecord(TestContext context) {
+    updateParsedMarcRecord(context, RecordType.MARC_BIB);
+  }
+
+  @Test
+  public void shouldUpdateParsedMarcAuthorityRecord(TestContext context) {
+    updateParsedMarcRecord(context, RecordType.MARC_AUTHORITY);
+  }
+
+  private void updateParsedMarcRecord(TestContext context, RecordType marcBib) {
     Async async = context.async();
 
-    ParsedRecord parsedRecord = record.getParsedRecord();
+    ParsedRecord parsedRecord = marcBibRecord.getParsedRecord();
     ParsedRecordDto parsedRecordDto = new ParsedRecordDto()
-      .withId(record.getMatchedId())
+      .withId(marcBibRecord.getMatchedId())
       .withParsedRecord(new ParsedRecord()
         .withContent(UPDATED_PARSED_RECORD_CONTENT))
-      .withRecordType(ParsedRecordDto.RecordType.MARC);
+      .withRecordType(marcBib);
 
     WireMock.stubFor(post(PUBSUB_PUBLISH_URL)
       .willReturn(WireMock.noContent()));
@@ -143,7 +164,7 @@ public class UpdatedRecordEventHandlingServiceTest extends AbstractLBServiceTest
     HashMap<String, String> payloadContext = new HashMap<>();
     payloadContext.put("PARSED_RECORD_DTO", Json.encode(parsedRecordDto));
 
-    Future<Boolean> future = recordService.saveRecord(record, TENANT_ID)
+    Future<Boolean> future = recordService.saveRecord(marcBibRecord, TENANT_ID)
       .compose(rec -> {
         try {
           return updateRecordEventHandler.handleEvent(ZIPArchiver.zip(Json.encode(payloadContext)), params);
@@ -157,30 +178,31 @@ public class UpdatedRecordEventHandlingServiceTest extends AbstractLBServiceTest
       if (ar.failed()) {
         context.fail(ar.cause());
       }
-      recordService.getSourceRecordById(record.getMatchedId(), ExternalIdType.RECORD, TENANT_ID).onComplete(getNew -> {
+      recordService.getSourceRecordById(marcBibRecord.getMatchedId(), ExternalIdType.RECORD, TENANT_ID).onComplete(getNew -> {
         if (getNew.failed()) {
           context.fail(getNew.cause());
         }
         context.assertTrue(getNew.result().isPresent());
         SourceRecord updatedRecord = getNew.result().get();
-        
+
         context.assertNotEquals(parsedRecord.getId(), updatedRecord.getParsedRecord().getId());
-        context.assertNotEquals(record.getSnapshotId(), updatedRecord.getSnapshotId());
+        context.assertNotEquals(marcBibRecord.getSnapshotId(), updatedRecord.getSnapshotId());
 
-        recordDao.getRecordByCondition(Tables.RECORDS_LB.ID.eq(UUID.fromString(record.getId())), TENANT_ID).onComplete(getOld -> {
-          if (getOld.failed()) {
-            context.fail(getOld.cause());
-          }
-          context.assertTrue(getOld.result().isPresent());
-          Record existingRecord = getOld.result().get();
+        recordDao.getRecordByCondition(Tables.RECORDS_LB.ID.eq(UUID.fromString(marcBibRecord.getId())), TENANT_ID)
+          .onComplete(getOld -> {
+            if (getOld.failed()) {
+              context.fail(getOld.cause());
+            }
+            context.assertTrue(getOld.result().isPresent());
+            Record existingRecord = getOld.result().get();
 
-          context.assertEquals(State.OLD, existingRecord.getState());
-          context.assertEquals(0, existingRecord.getGeneration());
-          context.assertEquals(parsedRecord.getId(), existingRecord.getParsedRecord().getId());
-          context.assertEquals(parsedRecord.getContent(), existingRecord.getParsedRecord().getContent());
-          context.assertEquals(record.getSnapshotId(), existingRecord.getSnapshotId());
-          async.complete();
-        });
+            context.assertEquals(State.OLD, existingRecord.getState());
+            context.assertEquals(0, existingRecord.getGeneration());
+            context.assertEquals(parsedRecord.getId(), existingRecord.getParsedRecord().getId());
+            context.assertEquals(parsedRecord.getContent(), existingRecord.getParsedRecord().getContent());
+            context.assertEquals(marcBibRecord.getSnapshotId(), existingRecord.getSnapshotId());
+            async.complete();
+          });
       });
     });
   }

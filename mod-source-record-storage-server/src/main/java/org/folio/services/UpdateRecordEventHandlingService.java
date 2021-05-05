@@ -55,7 +55,7 @@ public class UpdateRecordEventHandlingService implements EventHandlingService {
 
       return recordService.updateSourceRecord(record, snapshotId, params.getTenantId())
         .compose(updatedRecord -> {
-          eventPayload.put(Record.RecordType.MARC.value(), Json.encode(updatedRecord));
+          eventPayload.put(Record.RecordType.MARC_BIB.value(), Json.encode(updatedRecord));
           return sendEventWithPayloadToPubSub(Json.encode(eventPayload), QM_SRS_MARC_BIB_RECORD_UPDATED_EVENT_TYPE, params);
         })
         .onFailure(f -> sendEventWithPayloadToPubSub(Json.encode(eventPayload), QM_ERROR_EVENT_TYPE, params));
