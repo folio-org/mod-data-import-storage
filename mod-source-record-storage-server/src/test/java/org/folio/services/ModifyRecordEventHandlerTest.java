@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.folio.ActionProfile;
 import org.folio.DataImportEventPayload;
 import org.folio.JobProfile;
+import org.folio.JobProfile.DataType;
 import org.folio.MappingProfile;
 import org.folio.TestUtil;
 import org.folio.dao.RecordDao;
@@ -72,7 +73,7 @@ public class ModifyRecordEventHandlerTest extends AbstractLBServiceTest {
   private JobProfile jobProfile = new JobProfile()
     .withId(UUID.randomUUID().toString())
     .withName("Modify MARC Bibs")
-    .withDataType(JobProfile.DataType.MARC);
+    .withDataType(DataType.MARC_BIB);
 
   private ActionProfile actionProfile = new ActionProfile()
     .withId(UUID.randomUUID().toString())
