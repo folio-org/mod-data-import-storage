@@ -1,3 +1,6 @@
+## xxxx-xx-xx v5.1.1-SNAPSHOT
+* [MODSOURCE-279](https://issues.folio.org/browse/MODSOURCE-279) Store MARC Authority record
+
 ## 2021-04-12 v5.1.0-SNAPSHOT
 * [MODSOURCE-265](https://issues.folio.org/browse/MODSOURCE-265) Implement presence or absence searches  
 * [MODSOURCE-269](https://issues.folio.org/browse/MODSOURCE-269) Implement presence or absence searches for indicators
