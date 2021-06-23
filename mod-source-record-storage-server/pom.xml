@@ -157,8 +157,8 @@
       <groupId>org.folio</groupId>
       <artifactId>data-import-processing-core</artifactId>
       <scope>system</scope>
-      <version>version_of_lib</version>
-      <systemPath>path_to_lib</systemPath>
+      <version>3.2.0-SNAPSHOT</version>
+      <systemPath>${project.basedir}/lib/data-import-processing-core-fat.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -653,7 +653,7 @@
                     <Main-Class>org.folio.rest.RestLauncher</Main-Class>
                     <Main-Verticle>org.folio.rest.RestVerticle</Main-Verticle>
                     <Multi-Release>true</Multi-Release>
-                    <Class-Path>path_to_dependency_jar_file</Class-Path>
+                    <Class-Path>lib/data-import-processing-core-fat.jar</Class-Path>
                   </manifestEntries>
                 </transformer>
               </transformers>

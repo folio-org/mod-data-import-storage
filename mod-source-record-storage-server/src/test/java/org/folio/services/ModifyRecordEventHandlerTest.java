@@ -15,20 +15,10 @@ import org.folio.dao.RecordDao;
 import org.folio.dao.RecordDaoImpl;
 import org.folio.dao.util.SnapshotDaoUtil;
 import org.folio.processing.mapping.defaultmapper.processor.parameters.MappingParameters;
-import org.folio.rest.jaxrs.model.Data;
-import org.folio.rest.jaxrs.model.MappingDetail;
-import org.folio.rest.jaxrs.model.MarcField;
-import org.folio.rest.jaxrs.model.MarcMappingDetail;
-import org.folio.rest.jaxrs.model.MarcSubfield;
-import org.folio.rest.jaxrs.model.ParsedRecord;
-import org.folio.rest.jaxrs.model.ProfileSnapshotWrapper;
-import org.folio.rest.jaxrs.model.RawRecord;
+import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.jaxrs.model.Record;
 import org.folio.services.handlers.actions.ModifyRecordEventHandler;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -88,7 +78,7 @@ public class ModifyRecordEventHandlerTest extends AbstractLBServiceTest {
         .withSubfield("u")
         .withSubaction(MarcSubfield.Subaction.INSERT)
         .withPosition(MarcSubfield.Position.BEFORE_STRING)
-        .withData(new Data().withText("http://libproxy.smith.edu?url=")))));
+        .withData(new Data_().withText("http://libproxy.smith.edu?url=")))));
 
   private MappingProfile mappingProfile = new MappingProfile()
     .withId(UUID.randomUUID().toString())
