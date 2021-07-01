@@ -101,7 +101,7 @@ public enum RecordType implements ParsedRecordType {
     }
   },
 
-  MARC_HOLDINGS("marc_records_lb") {
+  MARC_HOLDING("marc_records_lb") {
     @Override
     public void formatRecord(Record record) throws FormatRecordException {
       if (Objects.nonNull(record.getRecordType()) && Objects.nonNull(record.getParsedRecord())
